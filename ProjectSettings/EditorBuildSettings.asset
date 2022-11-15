@@ -1,0 +1,152 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Resources/Scenes/start.unity
+    guid: 83e243a4544938b49aba076a255e7899
+  - enabled: 1
+    path: Assets/Resources/Scenes/interval.unity
+    guid: fcc0af19490b035478de400ad8c3f6e8
+  - enabled: 1
+    path: Assets/Resources/Scenes/animation_test/Low.unity
+    guid: e128a2e9788085f479c86f4d4a01d984
+  - enabled: 1
+    path: Assets/Resources/Scenes/animation_test/Medium.unity
+    guid: 18fc1f92128a79544a1f1a1b735ce7ce
+  - enabled: 1
+    path: Assets/Resources/Scenes/animation_test/High.unity
+    guid: 6e25a000c63847a45a39248539dc48d5
+  - enabled: 1
+    path: Assets/Resources/Scenes/batch_test/batch_all_massive.unity
+    guid: 843928104b60456409bf740ed50b85d8
+  - enabled: 1
+    path: Assets/Resources/Scenes/batch_test/batch_half_massive.unity
+    guid: 1ef465b2ce2c1554a8598a70a8970ccc
+  - enabled: 1
+    path: Assets/Resources/Scenes/batch_test/batch_quater_massive.unity
+    guid: 02ebb69975862344299ade0ad3f1599e
+  - enabled: 1
+    path: Assets/Resources/Scenes/batch_test/no_batch_massive.unity
+    guid: ff6db43c7da4ae242966f091e5db0eb3
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_shadow_test/p_light_shadow_high.unity
+    guid: 346662fabfec5a348b3a3b0401923076
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_shadow_test/p_light_shadow_low.unity
+    guid: 22eb6aaf15da89d4aa5073aeba8e5bd5
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_shadow_test/p_light_shadow_medium.unity
+    guid: 4b653dcd85e2c4e40b703e00482c138e
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_shadow_test/s_light_shadow_high.unity
+    guid: 3936288106db44048a313c87ce6be8d7
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_shadow_test/s_light_shadow_low.unity
+    guid: 3f01a1b55a682dc45aca3a09e9f5b36a
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_shadow_test/s_light_shadow_medium.unity
+    guid: 5ecd7a18736260c4dbcadb57d5001ec7
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/s_light_noshadow_high.unity
+    guid: 83d39fc402eb055489b633d79de18983
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/d_light_noshadow_high.unity
+    guid: 4edaad76fbd151c4aa7a8bb5acff7645
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/p_light_noshadow_high.unity
+    guid: 3510c8e44d7f9654d95ba6f4767f7bc6
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/s_light_noshadow_medium.unity
+    guid: 9bb37a587f51baa4798a1a8fcec39244
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/p_light_noshadow_medium.unity
+    guid: 2f9ed6a9e7f032f4597d8324007f3ce3
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/d_light_noshadow_medium.unity
+    guid: c7dd02046993795429236cb4eccac94b
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/s_light_noshadow_low.unity
+    guid: e00af77e44663fc40ab6e71776f188ec
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/p_light_noshadow_low.unity
+    guid: 5d5dd47f3b5a04940ba7df21099b1b81
+  - enabled: 1
+    path: Assets/Resources/Scenes/light_test/d_light_noshadow_low.unity
+    guid: 65367b5152cce3746859c8f683e39f11
+  - enabled: 1
+    path: Assets/Resources/Scenes/lightprobes_test/lightprobes_high.unity
+    guid: 5b362dce38133da49938fc265fcf3b12
+  - enabled: 1
+    path: Assets/Resources/Scenes/lightprobes_test/lightprobes_low.unity
+    guid: 0df861c41956778449925ed55bc5e180
+  - enabled: 1
+    path: Assets/Resources/Scenes/lightprobes_test/lightprobes_medium.unity
+    guid: 007b30ac06c411847ad54694550a9606
+  - enabled: 1
+    path: Assets/Resources/Scenes/particle_test/particle_high.unity
+    guid: e8a1bcf04572b4d4fb37e3d0dd7dc062
+  - enabled: 1
+    path: Assets/Resources/Scenes/particle_test/particle_low.unity
+    guid: 984e0797c03af3b48832962d1d442678
+  - enabled: 1
+    path: Assets/Resources/Scenes/particle_test/particle_medium.unity
+    guid: a1c284a636a122541b33bb9451ed33ee
+  - enabled: 1
+    path: Assets/Resources/Scenes/particle_test/vfx_high.unity
+    guid: dddbb01e2a446054c921c6bd029ece53
+  - enabled: 1
+    path: Assets/Resources/Scenes/particle_test/vfx_low.unity
+    guid: c5dbb8f69fb8dab44b2a609cdb8700b5
+  - enabled: 1
+    path: Assets/Resources/Scenes/particle_test/vfx_medium.unity
+    guid: d4ede307151735948889715b27f8e367
+  - enabled: 1
+    path: Assets/Resources/Scenes/polygon_test/High.unity
+    guid: be935c780144bd646a7414914689049d
+  - enabled: 1
+    path: Assets/Resources/Scenes/polygon_test/Low.unity
+    guid: 3ce5da702049e2f439849a593f48f75c
+  - enabled: 1
+    path: Assets/Resources/Scenes/polygon_test/Medium.unity
+    guid: bddb5bbb74872a147be4c3057cddc0fd
+  - enabled: 1
+    path: Assets/Resources/Scenes/postprocess_test/postprocess_all.unity
+    guid: d5dad8c7191c1ae48a0a58d43e2ee5d1
+  - enabled: 1
+    path: Assets/Resources/Scenes/shadow_caster_test/d_light_casters_high.unity
+    guid: 22981115bbcfb1e4eafa104331208bf1
+  - enabled: 1
+    path: Assets/Resources/Scenes/shadow_caster_test/d_light_casters_low.unity
+    guid: dd840fb4ccd15ff449be9b781d0cd562
+  - enabled: 1
+    path: Assets/Resources/Scenes/shadow_caster_test/d_light_casters_medium.unity
+    guid: 9258b62aea58b3e4f8bd9e3a118f25ea
+  - enabled: 1
+    path: Assets/Resources/Scenes/shadow_mapper_test/d_light_mapper_high.unity
+    guid: 3967bb8894b84f14689d3fe66aa75f78
+  - enabled: 1
+    path: Assets/Resources/Scenes/shadow_mapper_test/d_light_mapper_low.unity
+    guid: 61e67c8714fe874498245fb177c2b62d
+  - enabled: 1
+    path: Assets/Resources/Scenes/shadow_mapper_test/d_light_mapper_medium.unity
+    guid: f5490d8c3c86a4546b8bed8bf415fc48
+  - enabled: 1
+    path: Assets/Resources/Scenes/texture_test/High.unity
+    guid: 9ffc0b44cca26b046b0c9d4f16910188
+  - enabled: 1
+    path: Assets/Resources/Scenes/texture_test/Low.unity
+    guid: a2e286c5b2ad1754f8509aa0b7f8c655
+  - enabled: 1
+    path: Assets/Resources/Scenes/texture_test/Medium.unity
+    guid: 418a99f10bf11ef4985684aab8b33456
+  - enabled: 1
+    path: Assets/Resources/Scenes/tree_test/tree_disable.unity
+    guid: 451993cc63bed0144a7d975cf7f4e1e5
+  - enabled: 1
+    path: Assets/Resources/Scenes/tree_test/tree_enable.unity
+    guid: 44b31309cdda35d4cb1755a9079ff8f0
+  m_configObjects: {}
