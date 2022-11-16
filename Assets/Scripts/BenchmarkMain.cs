@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -63,6 +65,13 @@ public class BenchmarkMain : MonoBehaviour
     float displayFpsTimeCount;
     float displayFpsUpdateInterval;
 
+    bool isLightSettingScene;
+    bool haveSetMode;
+
+    FrameSettings frameSettings;
+    FrameSettingsOverrideMask frameSettingsOverrideMask;
+    HDAdditionalCameraData HDCData;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -70,6 +79,8 @@ public class BenchmarkMain : MonoBehaviour
         sceneCount = -1;
         displayFpsUpdateInterval = 2.0f;
         fpsStartCountWaitTime = 5.0f;
+        isLightSettingScene = false;
+        haveSetMode = false;
     }
 
     // Update is called once per frame
@@ -107,10 +118,19 @@ public class BenchmarkMain : MonoBehaviour
                 startUI.SetActive(false);
                 benchUI.SetActive(true);
                 intervalUI.SetActive(false);
+
+                isLightSettingScene = (info.category != "postprocess_test") ? true : false;
+                haveSetMode = false;
             }
         }
         else if (state == State.Benchmark)
         {
+            if (!haveSetMode && Camera.main != null)
+            {
+                SetLightMode(isLightSettingScene, Camera.main.gameObject);
+                haveSetMode = true;
+            }
+
             displayFpsFrame++;
             displayFpsTimeCount += Time.deltaTime;
             if (displayFpsTimeCount >= displayFpsUpdateInterval)
@@ -221,6 +241,51 @@ public class BenchmarkMain : MonoBehaviour
         // destroy self
         GameObject.Destroy(startUI.transform.parent.gameObject);
         GameObject.Destroy(gameObject);
+    }
+
+    void SetLightMode( bool isLightMode, GameObject camObject )
+    {
+        // clear taa motion blur bloom ao ssr dof
+        // taa
+        HDCData = camObject.GetComponent<HDAdditionalCameraData>();
+        if (HDCData != null)
+        {
+            HDCData.customRenderingSettings = true;
+
+            frameSettings = HDCData.renderingPathCustomFrameSettings;
+            frameSettingsOverrideMask = HDCData.renderingPathCustomFrameSettingsOverrideMask;
+            
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.ContactShadows] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.MotionVectors] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.SSR] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.SSAO] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.DepthOfField] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.Tonemapping] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.SSGI] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.ScreenSpaceShadows] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.Postprocess] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.Refraction] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.SkyReflection] = true;
+            frameSettingsOverrideMask.mask[(uint)FrameSettingsField.ColorGrading] = true;
+
+            HDCData.renderingPathCustomFrameSettingsOverrideMask = frameSettingsOverrideMask;
+
+            frameSettings.SetEnabled(FrameSettingsField.ContactShadows, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.MotionVectors, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.SSR, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.SSAO, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.DepthOfField, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.Tonemapping, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.SSGI, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.ScreenSpaceShadows, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.Postprocess, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.Refraction, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.SkyReflection, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.ColorGrading, !isLightMode);
+            frameSettings.SetEnabled(FrameSettingsField.Antialiasing, !isLightMode);
+
+            HDCData.renderingPathCustomFrameSettings = frameSettings;
+        }
     }
 
     void SaveCSV(string nombreArchivo)
