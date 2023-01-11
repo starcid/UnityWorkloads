@@ -70,4 +70,10 @@ public class Utils
     {
         return DateTime.Now.ToString("MM_dd_yyyy_HH_mm_ss");
     }
+
+    public static long GetTimeStamp()
+    {
+        TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0);
+        return (long)ts.TotalSeconds;
+    }
 }

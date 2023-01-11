@@ -2,10 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Unity.Collections;
 using System.IO;
 
 public class EditorUtils
 {
+    [MenuItem("Jobs/Leak Detection")]
+    private static void LeakDetection()
+    {
+        NativeLeakDetection.Mode = NativeLeakDetectionMode.Enabled;
+    }
+
+    [MenuItem("Jobs/Leak Detection With Stack Trace")]
+    private static void LeakDetecttionWithStackTrace()
+    {
+        NativeLeakDetection.Mode = NativeLeakDetectionMode.EnabledWithStackTrace;
+    }
+
+    [MenuItem("Jobs/No Leak Detection")]
+    private static void NoLeakDetection()
+    {
+        NativeLeakDetection.Mode = NativeLeakDetectionMode.Disabled;
+    }
+
     [MenuItem("Tools/Generator Random Textures")]
     static void GenerateRandomTextures()
     {

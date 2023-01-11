@@ -8,6 +8,9 @@ using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Networking;
+using Unity.Collections;
+using LitJson;
 
 [Serializable]
 public class SceneInfo
@@ -23,10 +26,14 @@ public class SceneBench
     public SceneBench(SceneInfo i)
     {
         info = i;
+        frameTimes = new List<float>();
+        startTime = 0;
     }
     public SceneInfo info;
 
     public float totalFps;
+    public long startTime;
+    public List<float> frameTimes;
 };
 
 public class BenchmarkMain : MonoBehaviour
@@ -43,12 +50,14 @@ public class BenchmarkMain : MonoBehaviour
     TextMeshProUGUI intervalFps;
     float benchTime;
     float intervalTime;
+    bool uploadFinished;
 
     enum State
     { 
         Setting,
         Interval,
         Benchmark,
+        Uploading,
     };
     State state;
     float timeCount;
@@ -76,6 +85,7 @@ public class BenchmarkMain : MonoBehaviour
     void Start()
     {
         state = State.Setting;
+        uploadFinished = false;
         sceneCount = -1;
         displayFpsUpdateInterval = 2.0f;
         fpsStartCountWaitTime = 5.0f;
@@ -147,11 +157,36 @@ public class BenchmarkMain : MonoBehaviour
             {
                 totalFrame++;
                 totalFrameTime += Time.deltaTime;
+                sceneLists[sceneCount].frameTimes.Add(Time.deltaTime);
+                if (sceneLists[sceneCount].startTime == 0)
+                {
+                    sceneLists[sceneCount].startTime = Utils.GetTimeStamp();
+                }
                 if (timeCount >= benchTime)
                 {
                     sceneLists[sceneCount].totalFps = (float)totalFrame / totalFrameTime;
                     Next((benchIndex != -1));
                 }
+            }
+        }
+        else if (state == State.Uploading)
+        {
+            if (uploadFinished)
+            {
+                state = State.Setting;
+
+                startUI.SetActive(true);
+                benchUI.SetActive(false);
+                intervalUI.SetActive(false);
+
+                // back to original
+                timeCount = 0.0f;
+                displayFpsTimeCount = 0.0f;
+                SceneManager.LoadScene("Resources/Scenes/start");
+
+                // destroy self
+                GameObject.Destroy(startUI.transform.parent.gameObject);
+                GameObject.Destroy(gameObject);
             }
         }
     }
@@ -224,23 +259,13 @@ public class BenchmarkMain : MonoBehaviour
 
     public void End()
     {
-        startUI.SetActive(true);
-        benchUI.SetActive(false);
-        intervalUI.SetActive(false);
-
         // recording
         SaveCSV("unity_bench_" + UnityEngine.SystemInfo.graphicsDeviceName + "_" + Utils.GetTimeStr());
 
-        state = State.Setting;
-
-        // back to original
-        timeCount = 0.0f;
-        displayFpsTimeCount = 0.0f;
-        SceneManager.LoadScene("Resources/Scenes/start");
-
-        // destroy self
-        GameObject.Destroy(startUI.transform.parent.gameObject);
-        GameObject.Destroy(gameObject);
+        // uploading result
+        UploadTestResult("unity_bench_" + Utils.GetTimeStr(), SystemInfo.processorType, SystemInfo.graphicsDeviceName, Application.version, Application.unityVersion, DateTime.Now, sceneLists);
+        
+        state = State.Uploading;
     }
 
     void SetLightMode( bool isLightMode, GameObject camObject )
@@ -327,5 +352,86 @@ public class BenchmarkMain : MonoBehaviour
 
         //Cerrar
         sr.Close();
+    }
+
+    void UploadTestResult(string testId, string cpuInfo, string gpuInfo, string benchVersion, string engineVersion, DateTime startTime, List<SceneBench> sceneLists)
+    {
+        string url = "https://uebench.intel.com/api/test/upload";
+        JsonData data = new JsonData();
+        JsonData benchDatas = new JsonData();
+
+        data["id"] = testId;
+        data["cpu"] = cpuInfo;
+        data["gpu"] = gpuInfo;
+        data["benchmark_version"] = benchVersion;
+        data["engine_version"] = engineVersion;
+        data["start_time"] = startTime.ToString("yyyy/MM/dd");
+
+        if (benchIndex == -1)
+        {
+            foreach (SceneBench bench in sceneLists)
+            {
+                JsonData benchData = new JsonData();
+
+                SetBenchSceneJsonData(benchData, bench);
+
+                benchDatas.Add(benchData);
+            }
+        }
+        else
+        {
+            JsonData benchData = new JsonData();
+            SceneBench bench = sceneLists[benchIndex];
+
+            SetBenchSceneJsonData(benchData, bench);
+
+            benchDatas.Add(benchData);
+        }
+        data["cases"] = benchDatas;
+
+        string dataStr = data.ToJson();
+        byte[] postBytes = System.Text.Encoding.Default.GetBytes(dataStr);
+        StartCoroutine(UnityWebRequestPost(url, postBytes));
+    }
+
+    void SetBenchSceneJsonData(JsonData benchData, SceneBench bench)
+    {
+        benchData["name"] = bench.info.category + "_" + bench.info.name;
+        benchData["param"] = bench.info.paramaters;
+
+        string frameTimeList = "[";
+        for (int i = 0; i < bench.frameTimes.Count; i++)
+        {
+            frameTimeList += bench.frameTimes[i].ToString();
+            if (i != bench.frameTimes.Count - 1)
+            {
+                frameTimeList += ",";
+            }
+        }
+        frameTimeList += "]";
+
+        benchData["frame_time_list"] = frameTimeList;
+        benchData["start_time"] = bench.startTime;
+    }
+
+    IEnumerator UnityWebRequestPost(string url, byte[] postBytes)
+    {
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+        request.uploadHandler = new UploadHandlerRaw(postBytes);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+        yield return request.SendWebRequest();
+        Debug.Log("Status Code: " + request.responseCode);
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.Log(request.error);
+        }
+        else
+        {
+            Debug.Log(request.downloadHandler.text);
+        }
+        request.Dispose();
+        uploadFinished = true;
     }
 }
