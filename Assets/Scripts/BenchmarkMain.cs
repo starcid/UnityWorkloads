@@ -27,12 +27,12 @@ public class SceneBench
     {
         info = i;
         frameTimes = new List<float>();
-        startTime = 0;
+        startTime = DateTime.MinValue;
     }
     public SceneInfo info;
 
     public float totalFps;
-    public long startTime;
+    public DateTime startTime;
     public List<float> frameTimes;
 };
 
@@ -157,10 +157,10 @@ public class BenchmarkMain : MonoBehaviour
             {
                 totalFrame++;
                 totalFrameTime += Time.deltaTime;
-                sceneLists[sceneCount].frameTimes.Add(Time.deltaTime);
-                if (sceneLists[sceneCount].startTime == 0)
+                sceneLists[sceneCount].frameTimes.Add(Time.deltaTime * 1000.0f);
+                if (sceneLists[sceneCount].startTime == DateTime.MinValue)
                 {
-                    sceneLists[sceneCount].startTime = Utils.GetTimeStamp();
+                    sceneLists[sceneCount].startTime = DateTime.Now;
                 }
                 if (timeCount >= benchTime)
                 {
@@ -357,15 +357,15 @@ public class BenchmarkMain : MonoBehaviour
     void UploadTestResult(string testId, string cpuInfo, string gpuInfo, string benchVersion, string engineVersion, DateTime startTime, List<SceneBench> sceneLists)
     {
         string url = "https://uebench.intel.com/api/test/upload";
-        JsonData data = new JsonData();
         JsonData benchDatas = new JsonData();
 
-        data["id"] = testId;
-        data["cpu"] = cpuInfo;
-        data["gpu"] = gpuInfo;
-        data["benchmark_version"] = benchVersion;
-        data["engine_version"] = engineVersion;
-        data["start_time"] = startTime.ToString("yyyy/MM/dd");
+        WWWForm form = new WWWForm();
+        form.AddField("id", testId);
+        form.AddField("cpu", cpuInfo);
+        form.AddField("gpu", gpuInfo);
+        form.AddField("benchmark_version", benchVersion);
+        form.AddField("engine_version", engineVersion);
+        form.AddField("start_time", startTime.ToString("yyyy/MM/dd hh:mm:ss"));
 
         if (benchIndex == -1)
         {
@@ -387,40 +387,29 @@ public class BenchmarkMain : MonoBehaviour
 
             benchDatas.Add(benchData);
         }
-        data["cases"] = benchDatas;
+        form.AddField("cases", benchDatas.ToJson());
 
-        string dataStr = data.ToJson();
-        byte[] postBytes = System.Text.Encoding.Default.GetBytes(dataStr);
-        StartCoroutine(UnityWebRequestPost(url, postBytes));
+        StartCoroutine(UnityWebRequestPost(url, form));
     }
 
     void SetBenchSceneJsonData(JsonData benchData, SceneBench bench)
     {
         benchData["name"] = bench.info.category + "_" + bench.info.name;
-        benchData["param"] = bench.info.paramaters;
+        benchData["param"] = 0;
 
-        string frameTimeList = "[";
+        JsonData frameTimeDatas = new JsonData();
         for (int i = 0; i < bench.frameTimes.Count; i++)
         {
-            frameTimeList += bench.frameTimes[i].ToString();
-            if (i != bench.frameTimes.Count - 1)
-            {
-                frameTimeList += ",";
-            }
+            frameTimeDatas.Add(bench.frameTimes[i].ToString());
         }
-        frameTimeList += "]";
 
-        benchData["frame_time_list"] = frameTimeList;
-        benchData["start_time"] = bench.startTime;
+        benchData["frame_time_list"] = frameTimeDatas;
+        benchData["start_time"] = bench.startTime.ToString("yyyy/MM/dd hh:mm:ss");
     }
 
-    IEnumerator UnityWebRequestPost(string url, byte[] postBytes)
+    IEnumerator UnityWebRequestPost(string url, WWWForm form)
     {
-        UnityWebRequest request = new UnityWebRequest(url, "POST");
-
-        request.uploadHandler = new UploadHandlerRaw(postBytes);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
+        UnityWebRequest request = UnityWebRequest.Post(url, form);
         yield return request.SendWebRequest();
         Debug.Log("Status Code: " + request.responseCode);
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
